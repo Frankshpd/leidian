@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fff6ea">
+<meta name="description" content="二年级加减乘除，用苹果一步一步看懂。不计时、不记分。">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="苹果数学">
+<title>苹果数学小课堂</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<style>
+  :root {
+    --bg: #fff6ea;
+    --ink: #3a2718;
+    --muted: #6d5644;
+    --line: #efd7c3;
+    --red: #d63a2f;
+    --green: #2e7d32;
+    --card: #fff;
+    --touch: 44px;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "WenQuanYi Micro Hei", "Microsoft YaHei", sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+  .app {
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding:
+      max(6px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(6px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+  h1 { margin: 0; font-size: 18px; line-height: 22px; font-weight: 800; }
+  h2 { margin: 0; font-size: 15px; line-height: 20px; font-weight: 750; }
+  .row { display: flex; gap: 6px; }
+  .row > button { flex: 1 1 0; }
+  button {
+    min-height: var(--touch);
+    min-width: var(--touch);
+    padding: 0 6px;
+    border-radius: 12px;
+    border: 2px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15px;
+    font-weight: 750;
+    line-height: 1.1;
+    white-space: nowrap;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  button[aria-pressed="true"] { background: var(--red); border-color: #b92f26; color: #fff; }
+  button.primary { background: var(--green); border-color: #1f6a28; color: #fff; }
+  button:disabled { opacity: 0.55; cursor: default; }
+  button:focus-visible, summary:focus-visible, .apple:focus-visible { outline: 3px solid #2a6fdb; outline-offset: 2px; }
+  .work { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 4px; }
+  .scene { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2px; }
+  .stage-wrap {
+    flex: 1;
+    min-height: 96px;
+    position: relative;
+    overflow: hidden;
+    background: #fffdf9;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+  }
+  .stage-scale { position: absolute; left: 50%; top: 50%; }
+  svg { display: block; }
+  .apple { transform-box: view-box; transform-origin: 0 0; }
+  .tools { display: flex; flex-direction: column; gap: 4px; min-height: 0; }
+  .status { min-height: 38px; font-size: 15px; line-height: 19px; }
+  .status .ask { font-weight: 750; }
+  .status .eq { font-size: 24px; line-height: 28px; font-weight: 800; }
+  .status .hint { color: var(--muted); font-size: 14px; line-height: 18px; }
+  .actions { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .extras { display: flex; flex-direction: column; max-height: 30dvh; overflow: auto; }
+  details summary {
+    min-height: var(--touch);
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  details p, details .more { margin: 0 0 6px; font-size: 14px; line-height: 1.45; color: var(--muted); }
+  details .more button { margin: 4px 0 8px; }
+  @media (min-width: 760px) {
+    .app {
+      gap: 8px;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(20px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(20px, env(safe-area-inset-left));
+    }
+    h1 { font-size: 26px; line-height: 32px; }
+    h2 { font-size: 22px; line-height: 28px; }
+    .work {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 380px);
+      gap: 20px;
+      align-items: stretch;
+    }
+    .scene { height: 100%; }
+    .tools { justify-content: center; gap: 10px; overflow: auto; }
+    .extras { max-height: none; }
+    .status { min-height: 72px; font-size: 18px; line-height: 26px; }
+    .status .eq { font-size: 32px; line-height: 38px; }
+    .status .hint { font-size: 16px; line-height: 22px; }
+    .actions { grid-template-columns: 1fr 1fr; }
+    .extras { overflow: auto; min-height: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>苹果数学小课堂</h1>
+    <nav class="row" aria-label="选择学习内容">
+      <button type="button" data-mode="add" aria-pressed="true">加法</button>
+      <button type="button" data-mode="sub">减法</button>
+      <button type="button" data-mode="mul">乘法</button>
+      <button type="button" data-mode="div">除法</button>
+    </nav>
+    <div class="row" id="division" hidden aria-label="除法的两种问题">
+      <button type="button" data-division="share" aria-pressed="true">平均分给几人</button>
+      <button type="button" data-division="bags">每袋装几个</button>
+    </div>
+  </header>
+  <div class="work">
+    <section class="scene" aria-label="动画舞台">
+      <h2 id="title"></h2>
+      <div class="stage-wrap">
+        <div class="stage-scale" id="scaler">
+          <svg id="stage" role="group" aria-label="苹果演示区：每个苹果都有固定编号，移动时可以跟着数。"></svg>
+        </div>
+      </div>
+    </section>
+    <section class="tools" aria-label="演示控制">
+      <div class="status" id="status" aria-live="polite"></div>
+      <div class="actions">
+        <button type="button" id="next" class="primary">下一步</button>
+        <button type="button" id="play">播放</button>
+        <button type="button" id="reset">重来</button>
+        <button type="button" id="next-ex">换题</button>
+      </div>
+      <div class="extras">
+        <details id="parent-help">
+          <summary>操作提示与讲解</summary>
+          <p>可以点有圆圈的苹果，也可以点“下一步”。编号帮助跟着数；播放时随时可暂停。</p>
+          <p id="explain" hidden></p>
+          <div class="more" id="mul-more" hidden>
+            <button type="button" id="to-share">用这些苹果学平均分</button>
+          </div>
+          <p id="div-note" hidden>平均分问“每人几个”；每袋装几个问“装几袋”。试试上方切换。</p>
+          <p>给家长：请孩子自己摆出来、说说为什么。不计时、不比快。</p>
+        </details>
+        <details id="install-help">
+          <summary>添加到主屏幕</summary>
+          <p>用 iPhone 的 Safari 打开本页。点底部的「分享」按钮（方框和一个向上的箭头），再点「添加到主屏幕」，最后点「添加」。以后从桌面上的图标打开，就是全屏的小课堂。第一次需要联网打开一次，之后没有网也能用。</p>
+        </details>
+      </div>
+    </section>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  const examples = {
+    add: [[3, 2], [7, 5], [9, 6]],
+    sub: [[8, 3], [12, 5], [16, 7]],
+    mul: [[4, 3], [3, 4], [5, 2], [2, 5]],
+    div: [[12, 3], [8, 2], [20, 5], [12, 4], [10, 5], [10, 2]]
+  };
+  const names = { add: '加法', sub: '减法', mul: '乘法', div: '除法' };
+  const FRUIT = 'M0 -8 C-15 -18 -18 2 -9 11 C-5 16 -2 12 0 12 C3 12 6 16 10 10 C19 -2 13 -17 0 -8 Z';
+  let mode = 'add';
+  let index = 0;
+  let division = 'share';
+  let step = 0;
+  let playing = false;
+  let epoch = 0;
+  let timer = 0;
+
+  const svg = document.getElementById('stage');
+  const scaler = document.getElementById('scaler');
+  const titleEl = document.getElementById('title');
+  const statusEl = document.getElementById('status');
+  const divisionRow = document.getElementById('division');
+  const explainEl = document.getElementById('explain');
+  const mulMore = document.getElementById('mul-more');
+  const divNote = document.getElementById('div-note');
+  const nextBtn = document.getElementById('next');
+  const playBtn = document.getElementById('play');
+  const toShareBtn = document.getElementById('to-share');
+
+  function current() {
+    const pair = examples[mode][index];
+    const a = pair[0];
+    const b = pair[1];
+    const grouped = mode === 'mul' || mode === 'div';
+    const total = mode === 'add' ? a + b : mode === 'mul' ? a * b : a;
+    const moves = mode === 'add' || mode === 'sub' ? b : total;
+    const placed = Math.min(step, moves);
+    const revealed = step > moves;
+    const groups = mode === 'mul' ? a : division === 'share' ? b : a / b;
+    const size = mode === 'mul' ? b : division === 'share' ? a / b : b;
+    const stageHeight = grouped ? 314 : 280;
+    return { a, b, grouped, total, moves, placed, revealed, groups, size, stageHeight };
+  }
+  function platePosition(g) { return { x: 6 + (g % 3) * 118, y: 119 + Math.floor(g / 3) * 97 }; }
+  function groupFor(i, m) { return mode === 'div' && division === 'share' ? i % m.groups : Math.floor(i / m.size); }
+  function slotFor(i, m) { return mode === 'div' && division === 'share' ? Math.floor(i / m.groups) : i % m.size; }
+  function position(i, m) {
+    if (m.grouped) {
+      if (i >= m.placed) return { x: 24 + (i % 10) * 34, y: 46 + Math.floor(i / 10) * 40 };
+      const p = platePosition(groupFor(i, m));
+      const slot = slotFor(i, m);
+      return { x: p.x + 24 + (slot % 3) * 32, y: p.y + 40 + Math.floor(slot / 3) * 29 };
+    }
+    if (mode === 'add') {
+      if (i < m.a || i - m.a < m.placed) return { x: 24 + (i % 8) * 44, y: 194 + Math.floor(i / 8) * 44 };
+      const k = i - m.a;
+      return { x: 24 + (k % 8) * 44, y: 54 + Math.floor(k / 8) * 44 };
+    }
+    if (i < m.placed) return { x: 24 + (i % 8) * 44, y: 194 + Math.floor(i / 8) * 44 };
+    return { x: 24 + (i % 8) * 44, y: 54 + Math.floor(i / 8) * 44 };
+  }
+  function texts(m) {
+    const title = mode === 'add' ? m.a + ' 个苹果，再来 ' + m.b + ' 个'
+      : mode === 'sub' ? m.a + ' 个苹果，拿走 ' + m.b + ' 个'
+      : mode === 'mul' ? m.a + ' 盘，每盘 ' + m.b + ' 个苹果'
+      : division === 'share' ? m.a + ' 个苹果，平均分给 ' + m.b + ' 人'
+      : m.a + ' 个苹果，每袋装 ' + m.b + ' 个';
+    const question = mode === 'add' ? '合起来有几个？' : mode === 'sub' ? '还剩几个？' : mode === 'mul' ? '一共有几个？' : division === 'share' ? '每人分到几个？' : '可以装满几袋？';
+    const total = m.total;
+    const equation = mode === 'add' ? m.a + ' + ' + m.b + ' = ' + (m.a + m.b)
+      : mode === 'sub' ? m.a + ' − ' + m.b + ' = ' + (m.a - m.b)
+      : mode === 'mul' ? m.a + ' × ' + m.b + ' = ' + total
+      : m.a + ' ÷ ' + m.b + ' = ' + (m.a / m.b);
+    const parts = [];
+    for (let n = 0; n < m.a; n++) parts.push(String(m.b));
+    const explanation = mode === 'add' ? '原来的 ' + m.a + ' 个和新来的 ' + m.b + ' 个合在一起，是 ' + total + ' 个。'
+      : mode === 'sub' ? '拿走的 ' + m.b + ' 个还在下面；只数上面留下的 ' + (m.a - m.b) + ' 个。'
+      : mode === 'mul' ? m.a + ' 个 ' + m.b + '，就是 ' + parts.join('＋') + '。这里 ' + m.a + '×' + m.b + ' 表示 ' + m.a + ' 个 ' + m.b + '。'
+      : division === 'share' ? '每人都有 ' + (m.a / m.b) + ' 个，每份同样多，这才是平均分。'
+      : '每袋都是 ' + m.b + ' 个，一共装满 ' + (m.a / m.b) + ' 袋。除出来的是袋数。';
+    const instruction = m.revealed
+      ? (mode === 'add' ? '合在一起，数出总共几个。'
+        : mode === 'sub' ? '只数留下的；拿走的仍在下面。'
+        : mode === 'mul' ? m.a + ' 个 ' + m.b + '，每盘同样多。'
+        : division === 'share' ? '每人 ' + (m.a / m.b) + ' 个，每份同样多。'
+        : '每袋 ' + m.b + ' 个，共 ' + (m.a / m.b) + ' 袋。')
+      : m.placed === m.moves ? '摆好了！数一数，再看算式。'
+      : mode === 'add' ? '一个一个合过来 · 已搬 ' + m.placed + '/' + m.moves
+      : mode === 'sub' ? '一个一个拿到下面 · 已拿 ' + m.placed + '/' + m.moves
+      : mode === 'mul' ? '每盘放满 ' + m.b + ' 个再换盘 · ' + m.placed + '/' + m.moves
+      : division === 'share' ? '一人一个，轮流分 · ' + m.placed + '/' + m.moves
+      : '每袋装满 ' + m.b + ' 个再换袋 · ' + m.placed + '/' + m.moves;
+    const waiting = m.grouped ? '待分配：' + (m.total - m.placed) + ' 个'
+      : mode === 'add' ? '新来的：还有 ' + (m.b - m.placed) + ' 个'
+      : '留下了：' + (m.a - m.placed) + ' 个';
+    const lower = mode === 'add' ? '合在一起：' + (m.a + m.placed) + ' 个' : '拿走了：' + m.placed + ' 个（仍看得见）';
+    return { title, question, equation, explanation, instruction, waiting, lower };
+  }
+
+  function el(name, attrs) {
+    const node = document.createElementNS('http://www.w3.org/2000/svg', name);
+    Object.keys(attrs || {}).forEach((key) => node.setAttribute(key, attrs[key]));
+    return node;
+  }
+  function ensureStage(m) {
+    if (svg.getAttribute('data-h') === String(m.stageHeight) && svg.querySelector('#apples')) return;
+    svg.setAttribute('viewBox', '0 0 360 ' + m.stageHeight);
+    svg.setAttribute('width', '360');
+    svg.setAttribute('height', String(m.stageHeight));
+    svg.setAttribute('data-h', String(m.stageHeight));
+    svg.replaceChildren();
+    svg.appendChild(el('text', { id: 'count-label', x: '8', y: '20', fill: '#3a2718', 'font-size': '14' }));
+    svg.appendChild(el('line', { id: 'divider', x1: '8', y1: m.grouped ? '112' : '132', x2: '352', y2: m.grouped ? '112' : '132', stroke: '#efd7c3' }));
+    const lower = el('text', { id: 'lower-label', x: '8', y: '160', fill: '#3a2718', 'font-size': '14' });
+    if (m.grouped) lower.setAttribute('hidden', '');
+    svg.appendChild(lower);
+    svg.appendChild(el('g', { id: 'plates' }));
+    svg.appendChild(el('g', { id: 'apples' }));
+  }
+  function makeApple(i) {
+    const g = el('g', { id: 'apple-' + (i + 1), class: 'apple' });
+    const body = el('g', { class: 'body' });
+    body.appendChild(el('circle', { class: 'ring', cx: '0', cy: '0', r: '22', fill: 'none', stroke: '#2a6fdb', 'stroke-width': '2', 'stroke-dasharray': '3 3' }));
+    body.appendChild(el('path', { class: 'fruit', d: FRUIT, stroke: '#7a2a22', 'stroke-width': '0.8' }));
+    body.appendChild(el('path', { d: 'M0 -8 Q-2 -16 4 -19', fill: 'none', stroke: '#5d7a32', 'stroke-width': '2' }));
+    body.appendChild(el('ellipse', { cx: '8', cy: '-16', rx: '6', ry: '3', transform: 'rotate(-30 8 -16)', fill: '#3d9a45' }));
+    const num = el('text', { class: 'num', x: '0', y: '28', 'text-anchor': 'middle', fill: '#5c4636', 'font-size': '13' });
+    num.textContent = String(i + 1);
+    body.appendChild(num);
+    g.appendChild(body);
+    g.addEventListener('click', () => { if (g.dataset.actionable === '1') advance(); });
+    g.addEventListener('keydown', (event) => {
+      if (g.dataset.actionable === '1' && (event.key === 'Enter' || event.key === ' ')) {
+        event.preventDefault();
+        advance();
+      }
+    });
+    return g;
+  }
+  function syncApples(m) {
+    const layer = document.getElementById('apples');
+    const scale = m.grouped ? 0.72 : 0.85;
+    const nextId = mode === 'add' ? m.a + m.placed : m.placed;
+    while (layer.childElementCount > m.total) layer.lastElementChild.remove();
+    for (let i = 0; i < m.total; i++) {
+      let g = document.getElementById('apple-' + (i + 1));
+      if (!g) layer.appendChild(g = makeApple(i));
+      const p = position(i, m);
+      const actionable = !m.revealed && m.placed < m.moves && i === nextId;
+      const removed = mode === 'sub' && i < m.placed;
+      g.dataset.actionable = actionable ? '1' : '0';
+      g.style.transition = step === 0 ? 'none' : 'transform 650ms ease-in-out';
+      g.style.transform = 'translate(' + p.x + 'px, ' + p.y + 'px)';
+      g.style.cursor = actionable ? 'pointer' : 'default';
+      if (actionable) {
+        g.setAttribute('role', 'button');
+        g.setAttribute('tabindex', '0');
+        g.setAttribute('aria-label', '苹果 ' + (i + 1) + '，点我移动');
+      } else {
+        g.removeAttribute('role');
+        g.removeAttribute('tabindex');
+        g.setAttribute('aria-label', '苹果 ' + (i + 1));
+      }
+      const body = g.firstElementChild;
+      body.setAttribute('transform', 'scale(' + scale + ')');
+      const ring = body.querySelector('.ring');
+      if (actionable) ring.removeAttribute('hidden'); else ring.setAttribute('hidden', '');
+      const fill = removed ? '#c8beb6' : (mode === 'add' && i >= m.a ? '#f0a202' : '#e23b2b');
+      body.querySelector('.fruit').setAttribute('fill', fill);
+    }
+  }
+  function syncPlates(m) {
+    const layer = document.getElementById('plates');
+    layer.replaceChildren();
+    if (!m.grouped) return;
+    for (let g = 0; g < m.groups; g++) {
+      const p = platePosition(g);
+      let count = 0;
+      for (let j = 0; j < m.placed; j++) if (groupFor(j, m) === g) count++;
+      const group = el('g', { id: 'plate-' + (g + 1) });
+      group.appendChild(el('rect', { x: p.x, y: p.y, width: '112', height: '93', rx: '15', fill: '#fff4e4', stroke: '#e2c7a4', 'stroke-width': '1.5' }));
+      const label = el('text', { id: 'plate-label-' + (g + 1), x: p.x + 56, y: p.y + 17, 'text-anchor': 'middle', fill: '#6d5644', 'font-size': '12' });
+      const name = mode === 'mul' ? '第 ' + (g + 1) + ' 盘' : division === 'share' ? '小朋友 ' + (g + 1) : '第 ' + (g + 1) + ' 袋';
+      label.textContent = name + ' · ' + count + ' 个';
+      group.appendChild(label);
+      layer.appendChild(group);
+    }
+  }
+  function fitStage() {
+    const wrap = document.querySelector('.stage-wrap');
+    const box = svg.viewBox.baseVal;
+    if (!box.width || !wrap.clientWidth || !wrap.clientHeight) return;
+    const s = Math.min(wrap.clientWidth / box.width, wrap.clientHeight / box.height);
+    scaler.style.width = box.width + 'px';
+    scaler.style.height = box.height + 'px';
+    scaler.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  function render() {
+    const m = current();
+    const t = texts(m);
+    document.querySelectorAll('[data-mode]').forEach((btn) => btn.setAttribute('aria-pressed', btn.dataset.mode === mode ? 'true' : 'false'));
+    document.querySelectorAll('[data-division]').forEach((btn) => btn.setAttribute('aria-pressed', btn.dataset.division === division ? 'true' : 'false'));
+    divisionRow.hidden = mode !== 'div';
+    divNote.hidden = mode !== 'div';
+    titleEl.textContent = t.title;
+    ensureStage(m);
+    document.getElementById('count-label').textContent = t.waiting;
+    const lower = document.getElementById('lower-label');
+    if (m.grouped) lower.setAttribute('hidden', '');
+    else { lower.removeAttribute('hidden'); lower.textContent = t.lower; }
+    syncPlates(m);
+    syncApples(m);
+    statusEl.replaceChildren();
+    if (m.revealed) {
+      const eq = document.createElement('div');
+      eq.className = 'eq';
+      eq.id = 'equation';
+      eq.setAttribute('role', 'math');
+      eq.setAttribute('aria-label', t.equation);
+      eq.textContent = t.equation;
+      statusEl.appendChild(eq);
+    } else {
+      const ask = document.createElement('div');
+      ask.className = 'ask';
+      ask.textContent = m.placed === 0 ? t.question : '先摆物体，再看算式';
+      statusEl.appendChild(ask);
+    }
+    const hint = document.createElement('div');
+    hint.className = 'hint';
+    hint.id = 'instruction';
+    hint.textContent = t.instruction;
+    statusEl.appendChild(hint);
+    nextBtn.textContent = m.placed === m.moves && !m.revealed ? '看算式' : '下一步';
+    nextBtn.disabled = m.revealed;
+    playBtn.disabled = m.revealed;
+    playBtn.textContent = playing ? '暂停' : '播放';
+    explainEl.hidden = !m.revealed;
+    explainEl.textContent = m.revealed ? t.explanation : '';
+    const showMul = m.revealed && mode === 'mul';
+    mulMore.hidden = !showMul;
+    if (showMul) toShareBtn.textContent = '用这 ' + m.total + ' 个学平均分';
+    fitStage();
+  }
+  function stopTimer() { clearTimeout(timer); timer = 0; }
+  function schedule() {
+    stopTimer();
+    if (!playing) return;
+    const m = current();
+    if (step >= m.moves + 1) { playing = false; render(); return; }
+    const generation = epoch;
+    timer = setTimeout(() => {
+      if (generation !== epoch) return;
+      const now = current();
+      step = Math.min(now.moves + 1, step + 1);
+      render();
+      schedule();
+    }, 1100);
+  }
+  function stopReset() { epoch += 1; playing = false; step = 0; stopTimer(); }
+  function advance() {
+    playing = false;
+    stopTimer();
+    const m = current();
+    step = Math.min(m.moves + 1, step + 1);
+    render();
+  }
+  function changeMode(next) { stopReset(); mode = next; index = 0; render(); }
+  document.querySelectorAll('[data-mode]').forEach((btn) => btn.addEventListener('click', () => changeMode(btn.dataset.mode)));
+  document.querySelectorAll('[data-division]').forEach((btn) => btn.addEventListener('click', () => { stopReset(); division = btn.dataset.division; render(); }));
+  nextBtn.addEventListener('click', advance);
+  playBtn.addEventListener('click', () => { playing = !playing; render(); schedule(); });
+  document.getElementById('reset').addEventListener('click', () => { stopReset(); render(); });
+  document.getElementById('next-ex').addEventListener('click', () => { stopReset(); index = (index + 1) % examples[mode].length; render(); });
+  toShareBtn.addEventListener('click', () => {
+    const m = current();
+    const match = examples.div.findIndex((pair) => pair[0] === m.total && pair[1] === m.a);
+    stopReset();
+    mode = 'div';
+    division = 'share';
+    index = match >= 0 ? match : 0;
+    render();
+  });
+  window.addEventListener('resize', fitStage);
+  if (window.ResizeObserver) new ResizeObserver(fitStage).observe(document.querySelector('.stage-wrap'));
+  render();
+
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      const controller = navigator.serviceWorker.controller;
+      if (!controller || !controller.scriptURL.endsWith('/math/sw.js')) return;
+      if (sessionStorage.getItem('mathSwReady') === '1' || reloading) return;
+      reloading = true;
+      sessionStorage.setItem('mathSwReady', '1');
+      location.reload();
+    });
+    navigator.serviceWorker.register('./sw.js', { scope: './' }).then((reg) => {
+      const controller = navigator.serviceWorker.controller;
+      if (reg.active && (!controller || !controller.scriptURL.endsWith('/math/sw.js'))) reg.active.postMessage({ type: 'claim' });
+    }).catch(() => {});
+  }
+})();
+</script>
+</body>
+</html>
