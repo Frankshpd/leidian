@@ -211,7 +211,7 @@ function beginStage() {
   banner = { text: `第 ${loop + 1} 关 · ${STAGES[stageNo()].name}`, sub: loop >= STAGE_COUNT ? `第 ${Math.floor(loop / STAGE_COUNT) + 1} 轮 · 难度提升！` : '出击！', t: 160 };
   clearKeys();
 }
-const MAXHP = 20;
+const MAXHP = 3;
 const later = (d, f) => pending.push({ t: stageT + d, f });
 
 // ================== 关卡编排 ==================
@@ -1631,7 +1631,7 @@ function drawPlayer(p) {
   shadow(p.x, p.y, 14, 7);
   const hurt = p.hurtT > 0 && Math.floor(p.hurtT / 3) % 2 === 0;
   drawJet(p.x, p.y, hurt ? '#ffffff' : p.color, hurt ? '#ff3030' : p.color2, p.bank);
-  if (p.hp < MAXHP) { rect(p.x - 15, p.y + 22, 30, 3, 'rgba(0,0,0,0.6)'); rect(p.x - 15, p.y + 22, 30 * p.hp / MAXHP, 3, p.hp > 10 ? '#50e070' : p.hp > 5 ? '#ffd040' : '#ff4040'); }
+  if (p.hp < MAXHP) { rect(p.x - 15, p.y + 22, 30, 3, 'rgba(0,0,0,0.6)'); rect(p.x - 15, p.y + 22, 30 * p.hp / MAXHP, 3, p.hp / MAXHP > 0.5 ? '#50e070' : p.hp / MAXHP > 0.25 ? '#ffd040' : '#ff4040'); }
   if (mode === 2 && (p.inv > 0 || frame % 240 < 60)) text(`${p.id + 1}P`, p.x, p.y + 34, 11, p.color);
 }
 function drawEnemy(e) {
@@ -1874,7 +1874,7 @@ function drawTitle() {
     ['S方块：H=追踪导弹　M=核导弹　B=炸弹+1', '#ffd890', 14],
     ['换颜色直接换武器；同颜色答对数学题才升级', '#9fe8ff', 14],
     ['每关开始前答对3道英语填空题才能出发', '#9fe8ff', 14],
-    ['3条命，每条命20点血量（中弹20次才爆机）', '#bbb', 13],
+    ['3条命，每条命3点血量（中弹3次才爆机）', '#bbb', 13],
   ];
   L.forEach((l, i) => text(l[0], W / 2, 304 + i * 30, l[2], l[1], 'center', i < 2, false));
   text('选择难度', W / 2, 530, 17, '#cfd8e0');
